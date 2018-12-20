@@ -1,0 +1,14 @@
+{
+  "name": "day11_rust_node",
+  "version": "0.1.0",
+  "description": "day11 advent of code",
+  "main": "lib/index.js",
+  "author": "Ryan Riginding <ryan@riginding.com>",
+  "license": "MIT",
+  "dependencies": {
+    "neon-cli": "^0.2.0"
+  },
+  "scripts": {
+    "install": "neon build"
+  }
+}

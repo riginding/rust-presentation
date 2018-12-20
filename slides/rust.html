@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(ryan)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/moon.css" id="theme"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org84784aa">
+<h2 id="org84784aa">Agenda</h2>
+<ul>
+<li>How and why to use native code</li>
+<li>Why Rust</li>
+<li>Advent of Code - Day 11</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org02116c4">
+<h2 id="org02116c4">Why to use native code</h2>
+<ul>
+<li>Raw performance</li>
+<li>Threads and parallel programming</li>
+<li>Access to native OS-specific libraries</li>
+<li>Predictable runtime performance without gc</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org986106b">
+<h2 id="org986106b">How to use native code</h2>
+<ul>
+<li>Native Bindings</li>
+<li>Webassembly</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org092b725">
+<h2 id="org092b725">Why Rust</h2>
+</section>
+</section>
+<section>
+<section id="slide-orgf898c0c">
+<h2 id="orgf898c0c">Rust - you are using it today</h2>
+<ul>
+<li>ripgrep</li>
+<li>Firefox</li>
+<li>dropbox</li>
+<li>npm</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org096fbc6">
+<h2 id="org096fbc6">Rust</h2>
+<ul>
+<li>low level language performance</li>
+<li>high level language tooling</li>
+<li>with modern language features</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgb9f4ad2">
+<h2 id="orgb9f4ad2">Rust - not original</h2>
+<ul>
+<li>Abstract Machine Model : C</li>
+<li>Data types : C, SML, OCaml, Lisp, Limbo</li>
+<li>Optional Bindings : Swift</li>
+<li>Hygienic Macros : Scheme</li>
+<li>Functional Programming : Haskell, OCaml, F#</li>
+<li>Attributes : ECMA-335</li>
+<li>Memory Model and Memory Management : C++, ML Kit, Cyclone</li>
+<li>Type Classes : Haskell</li>
+<li>Crate : Assembly in the ECMA-335 CLI model</li>
+<li>Channels and Concurrency : Newsqueak, Alef, Limbo</li>
+<li>Message passing and Thread failure : Erlang</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org22c4a08">
+<h2 id="org22c4a08">Stackoverflow Survey 2018</h2>
+<img height="auto" src="./2018.png">
+</section>
+</section>
+<section>
+<section id="slide-orgf87c46e">
+<h2 id="orgf87c46e">Stackoverflow Survey 2017</h2>
+<img height="auto" src="./2017.png">
+</section>
+</section>
+<section>
+<section id="slide-orgb9b81cb">
+<h2 id="orgb9b81cb">Stackoverflow Survey 2016</h2>
+<img height="auto" src="./2016.png">
+</section>
+</section>
+<section>
+<section id="slide-org01df15b">
+<h2 id="org01df15b">Stackoverflow Survey 2015</h2>
+<img height="auto" src="./2015.png">
+
+
+</section>
+</section>
+<section>
+<section id="slide-org1ca94af">
+<h2 id="org1ca94af"><del>Can't</del> have your cake and eat it too</h2>
+</section>
+</section>
+<section>
+<section id="slide-orgc9b12f4">
+<h2 id="orgc9b12f4">memory safety without runtime GC</h2>
+<img height="auto" src="./rust_control_safety.png">
+</section>
+</section>
+<section>
+<section id="slide-orgd0b768a">
+<h2 id="orgd0b768a">abstraction without overhead 1</h2>
+<div class="org-src-container">
+
+<pre><code class="rust" >for i in 12..buffer.len() {
+    let prediction = coefficients.iter()
+                                 .zip(&buffer[i - 12..i])
+                                 .map(|(&c, &s)| c * s as i64)
+                                 .sum::<i64>() >> qlp_shift;
+    let delta = buffer[i];
+    buffer[i] = prediction as i32 + delta;
+}
+</code></pre>
+</div>
+<p>
+code sample
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgd1dac02">
+<h2 id="orgd1dac02">abstraction without overhead 2</h2>
+<div class="org-src-container">
+
+<pre><code class="assembler" >10c00:
+movslq %r14d,%r11
+movslq -0x2c(%r8,%rdi,4),%rsi
+imul   %r10,%rsi
+movslq -0x30(%r8,%rdi,4),%r14
+imul   %rbp,%r14
+add    %rsi,%r14
+movslq -0x28(%r8,%rdi,4),%rsi
+imul   %rdx,%rsi
+add    %rsi,%r14
+movslq -0x24(%r8,%rdi,4),%rsi
+imul   %rax,%rsi
+add    %rsi,%r14
+movslq -0x20(%r8,%rdi,4),%rsi
+imul   %rbx,%rsi
+add    %rsi,%r14
+movslq -0x1c(%r8,%rdi,4),%rsi
+imul   %r15,%rsi
+add    %rsi,%r14
+movslq -0x18(%r8,%rdi,4),%rsi
+imul   %r13,%rsi
+add    %rsi,%r14
+movslq -0x14(%r8,%rdi,4),%rsi
+imul   %r12,%rsi
+add    %rsi,%r14
+movslq -0x10(%r8,%rdi,4),%rsi
+imul   0x8(%rsp),%rsi
+add    %rsi,%r14
+movslq -0xc(%r8,%rdi,4),%rsi
+imul   0x18(%rsp),%rsi
+add    %rsi,%r14
+movslq -0x8(%r8,%rdi,4),%rsi
+imul   0x20(%rsp),%rsi
+add    %rsi,%r14
+imul   0x10(%rsp),%r11
+add    %r11,%r14
+sar    %cl,%r14
+add    (%r8,%rdi,4),%r14d
+mov    %r14d,(%r8,%rdi,4)
+inc    %rdi
+cmp    %r9,%rdi
+jb     10c00 &lt;claxon::subframe::predict_lpc::h6c02f07b190820c0+0x2b0&gt;
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgda57d0e">
+<h2 id="orgda57d0e">threading without data races.</h2>
+<div class="org-src-container">
+
+<pre><code class="rust" >for i in 12..buffer.len() {
+    let prediction = coefficients.par_iter()
+                                 .zip(&buffer[i - 12..i])
+                                 .map(|(&c, &s)| c * s as i64)
+                                 .sum::<i64>() >> qlp_shift;
+    let delta = buffer[i];
+    buffer[i] = prediction as i32 + delta;
+}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org9a9e633">
+<h2 id="org9a9e633">Advent of Code - Day 11</h2>
+<p>
+<a href="https://adventofcode.com/2018/day/11">https://adventofcode.com/2018/day/11</a>
+</p>
+
+<ul>
+<li>populate grid (size 300 x 300)</li>
+<li>find the sqare with the highest sum cell value</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org3d497d3">
+<h2 id="org3d497d3">JS Solution</h2>
+<p>
+DEMO
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org3a1a95d">
+<h2 id="org3a1a95d">JS Solution with Rust</h2>
+<p>
+DEMO
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org204f175">
+<h2 id="org204f175">Summed Area Table</h2>
+<img height="auto" src="./summed.png">
+</section>
+</section>
+<section>
+<section id="slide-orgadb2d4b">
+<h2 id="orgadb2d4b">conclusion</h2>
+<ol>
+<li>JS often fast enough</li>
+<li>algorithms</li>
+<li>use native</li>
+
+</ol>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+#+OPTIONS: reveal_title_slide:nil num:nil toc:nil
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_PLUGINS: (highlight notes)
+#+REVEAL_HLEVEL: 2
+#+REVEAL_TRANS: none
+
+* Agenda
+- How and why to use native code
+- Why Rust
+- Advent of Code - Day 11
+
+* Why to use native code
+- Raw performance
+- Threads and parallel programming
+- Access to native OS-specific libraries
+- Predictable runtime performance without gc
+
+* How to use native code
+ -  Native Bindings
+ -  Webassembly
+
+* Why Rust
+* Rust - you are using it today
+ - ripgrep
+ - Firefox
+ - dropbox
+ - npm
+
+* Rust
+  - low level language performance
+  - high level language tooling
+  - with modern language features
+
+* Rust - not original
+ - Abstract Machine Model : C
+ - Data types : C, SML, OCaml, Lisp, Limbo
+ - Optional Bindings : Swift
+ - Hygienic Macros : Scheme
+ - Functional Programming : Haskell, OCaml, F#
+ - Attributes : ECMA-335
+ - Memory Model and Memory Management : C++, ML Kit, Cyclone
+ - Type Classes : Haskell
+ - Crate : Assembly in the ECMA-335 CLI model
+ - Channels and Concurrency : Newsqueak, Alef, Limbo
+ - Message passing and Thread failure : Erlang
+
+* Stackoverflow Survey 2018
+ #+REVEAL_HTML: <img height="auto" src="./2018.png">
+* Stackoverflow Survey 2017
+ #+REVEAL_HTML: <img height="auto" src="./2017.png">
+* Stackoverflow Survey 2016
+ #+REVEAL_HTML: <img height="auto" src="./2016.png">
+* Stackoverflow Survey 2015
+ #+REVEAL_HTML: <img height="auto" src="./2015.png">
+
+
+* +Can't+ have your cake and eat it too
+* memory safety without runtime GC
+ #+REVEAL_HTML: <img height="auto" src="./rust_control_safety.png">
+* abstraction without overhead 1
+#+BEGIN_SRC rust
+for i in 12..buffer.len() {
+    let prediction = coefficients.iter()
+                                 .zip(&buffer[i - 12..i])
+                                 .map(|(&c, &s)| c * s as i64)
+                                 .sum::<i64>() >> qlp_shift;
+    let delta = buffer[i];
+    buffer[i] = prediction as i32 + delta;
+}
+#+END_SRC
+code sample
+* abstraction without overhead 2
+#+BEGIN_SRC assembler
+10c00:
+movslq %r14d,%r11
+movslq -0x2c(%r8,%rdi,4),%rsi
+imul   %r10,%rsi
+movslq -0x30(%r8,%rdi,4),%r14
+imul   %rbp,%r14
+add    %rsi,%r14
+movslq -0x28(%r8,%rdi,4),%rsi
+imul   %rdx,%rsi
+add    %rsi,%r14
+movslq -0x24(%r8,%rdi,4),%rsi
+imul   %rax,%rsi
+add    %rsi,%r14
+movslq -0x20(%r8,%rdi,4),%rsi
+imul   %rbx,%rsi
+add    %rsi,%r14
+movslq -0x1c(%r8,%rdi,4),%rsi
+imul   %r15,%rsi
+add    %rsi,%r14
+movslq -0x18(%r8,%rdi,4),%rsi
+imul   %r13,%rsi
+add    %rsi,%r14
+movslq -0x14(%r8,%rdi,4),%rsi
+imul   %r12,%rsi
+add    %rsi,%r14
+movslq -0x10(%r8,%rdi,4),%rsi
+imul   0x8(%rsp),%rsi
+add    %rsi,%r14
+movslq -0xc(%r8,%rdi,4),%rsi
+imul   0x18(%rsp),%rsi
+add    %rsi,%r14
+movslq -0x8(%r8,%rdi,4),%rsi
+imul   0x20(%rsp),%rsi
+add    %rsi,%r14
+imul   0x10(%rsp),%r11
+add    %r11,%r14
+sar    %cl,%r14
+add    (%r8,%rdi,4),%r14d
+mov    %r14d,(%r8,%rdi,4)
+inc    %rdi
+cmp    %r9,%rdi
+jb     10c00 <claxon::subframe::predict_lpc::h6c02f07b190820c0+0x2b0>
+#+END_SRC
+* threading without data races.
+#+BEGIN_SRC rust
+for i in 12..buffer.len() {
+    let prediction = coefficients.par_iter()
+                                 .zip(&buffer[i - 12..i])
+                                 .map(|(&c, &s)| c * s as i64)
+                                 .sum::<i64>() >> qlp_shift;
+    let delta = buffer[i];
+    buffer[i] = prediction as i32 + delta;
+}
+#+END_SRC
+ 
+* Advent of Code - Day 11
+   https://adventofcode.com/2018/day/11
+
+   - populate grid (size 300 x 300)
+   - find the sqare with the highest sum cell value
+
+* JS Solution
+   DEMO
+* JS Solution with Rust
+   DEMO
+* Summed Area Table
+ #+REVEAL_HTML: <img height="auto" src="./summed.png">
+* conclusion
+ 1. JS often fast enough
+ 2. algorithms
+ 3. use native
